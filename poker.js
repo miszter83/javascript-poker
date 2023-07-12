@@ -64,7 +64,6 @@ function renderPot() {
     potContainer.innerHTML = `
         <div class="chip-count">Pot: ${ pot }</div>
         `;
-
 }
 
 function render() {
@@ -84,14 +83,31 @@ function drawAndRenderPlayerCards() {
             render();
         });
 }
-function startGame() {
-    initialize();
+
+function postBlinds() {
+    playerChips -= 1;
+    computerChips -= 2;
+    pot += 3;
+    render();
+}
+
+// Egy leosztást is indítása
+function startHand() { // hand = leosztás
+    postBlinds(); // vaktétek adminisztrálása
     fetch('https://www.deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
         .then(data => data.json())
         .then(response => {
             deckId = response.deck_id;
             drawAndRenderPlayerCards(); //todo: refactorálás async-await segítségével
-});
+        });    
+}
+
+
+// EGy játék egy vagy több leosztásból áll.
+
+function startGame() {
+    initialize();
+    startHand();
 }
 
 function bet() {

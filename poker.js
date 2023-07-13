@@ -7,14 +7,15 @@ const betSlider = document.querySelector('#bet-amount');
 const betSliderValue = document.querySelector('.js-slider-value');
 const betButton = document.querySelector('.js-bet-button');
 
-
 // program state
 let {
     deckId,
-    playerCards,   
-    playerChips,    // játékos zsetonjai
-    computerChips,  // gép zsetonjai
-    pot
+    playerCards,     // játékos lapjai
+    computerCards,   // számítógép lapjai   (TODO: private: OOP?)
+    playerChips,     // játékos zsetonjai
+    computerChips,   // gép zsetonjai
+    playerBetPlaced, // játékos már licitált
+    pot              // kassza
 } = getInitialState();
 
 function getInitialState() {
@@ -23,16 +24,24 @@ function getInitialState() {
         playerCards: [],
         playerChips: 100,
         computerChips: 100,
+        playerBetPlaced: false,
         pot: 0
     };
 }
 
 function initialize() {
-    ({deckId, playerCards, playerChips, computerChips, pot} = getInitialState());     
+    ({
+        deckId,
+        playerCards, 
+        playerChips, 
+        computerChips, 
+        playerBetPlaced,
+        pot
+    } = getInitialState());     
 }
 
 function canBet() {
-    return playerCards.length === 2 && playerChips > 0 && pot === 0;
+    return playerCards.length === 2 && playerChips > 0 && playerBetPlaced === false;
 }
 
 function renderSlider() {
@@ -102,12 +111,40 @@ function startHand() { // hand = leosztás
         });    
 }
 
-
 // EGy játék egy vagy több leosztásból áll.
-
 function startGame() {
     initialize();
     startHand();
+}
+
+function shouldComputerCall() {
+    if (computerCards.length !== 2) return false; //extra védelem
+    const card1Code = computerCards[0].code;    //pl. AC, 4H, 9D, 0H (10: 0)
+    const card2Code = computerCards[1].code;
+    const card1Value = card1Code[0];
+    const card2Value = card2Code[0];
+    const card1Suit = card1Code[1];
+    const card2Suit = card2Code[1];
+
+    return card1Value === card2Value ||
+           ['0', 'J', 'Q', 'K', 'A'].includes(card1Value) ||
+           ['0', 'J', 'Q', 'K', 'A'].includes(card2Value) ||
+           (
+                card1Suit === card2Suit && 
+                Math.abs (Number(card1Value) - Number(card2Value)) <= 2
+            );
+}
+
+
+function computerMoveAfterBet() {
+    fetch(`https://www.deckofcardsapi.com/api/deck/${ deckId }/draw/?count=2`)
+        .then(data => data.json())
+        .then(response => {
+            computerCards = response.cards;
+            alert(shouldComputerCall() ? 'Call' : 'Fold');
+            console.log(computerCards);
+            //render();
+        });
 }
 
 function bet() {
@@ -116,8 +153,12 @@ function bet() {
     pot += betValue;
     // játékos zsetonjaiból kivonjuk a bet méretét
     playerChips -= betValue;  
+    // játék állapota: játékos megtette a tétjét
+    playerBetPlaced = true;
     // újrarenderellünk
     render();
+    // ellenfél reakciója
+    computerMoveAfterBet();
 
 }
 

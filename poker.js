@@ -147,6 +147,23 @@ function startGame() {
     startHand();
 }
 
+function endHand() {
+    setTimeout(() => {
+        if (computerAction === 'Fold') { //TODO: felorolt típus kell az akcióknak
+            playerChips += pot;
+            pot = 0;
+        }
+        deckId = null;
+        playerBets = 0;
+        computerBets = 0;
+        playerCards = [];
+        computerCards = [];
+        computerAction = null;
+        playerBetPlaced = false;
+        render();    
+    }, 2000);
+}
+
 function shouldComputerCall(computerCards) {
     if (computerCards.length !== 2) return false; //extra védelem
     const card1Code = computerCards[0].code;    //pl. AC, 4H, 9D, 0H (10: 0)
@@ -189,8 +206,10 @@ function computerMoveAfterBet() {
             pot += difference;
         } else {
             computerAction ='Fold';   
+
         }
         render();
+        endHand();
         });
 }
 

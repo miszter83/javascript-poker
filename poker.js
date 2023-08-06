@@ -155,16 +155,16 @@ function startGame() {
 
 function endHand(winner = null) {
     setTimeout(() => {
-        if (computerAction === 'Fold') { //TODO: felorolt típus kell az akcióknak
+        if (computerAction === ACTIONS.Fold) {
             playerChips += pot;
             pot = 0;
-        } else  if (winner === 'Player') {
+        } else  if (winner === WINNER.Player) {
             playerChips += pot;
             pot = 0;
-        } else if (winner === 'Computer') {   
+        } else if (winner === WINNER.Computer) {   
             computerChips += pot;
             pot = 0;
-        } else if (winner === 'Draw') { 
+        } else if (winner === WINNER.Draw) { 
             playerChips += playerBets;
             computerChips += computerBets;
             pot = 0;
@@ -212,12 +212,12 @@ async function getWinner() {
     const response = await data.json();
     const winners = response.winners;
     if(winners.length === 2) {
-        return'Draw'    //TODO? felsorol típus
+        return WINNER.Draw    //TODO? felsorol típus
     } else if (winners[0].cards === pc0) { 
         //játékos nyert
-        return 'Player';
+        return WINNER.Player;
     } else {
-        return 'Computer';
+        return WINNER.Computer;
     }   
 } 
 
@@ -234,14 +234,14 @@ async function computerMoveAfterBet() {
     const data = await fetch(`https://www.deckofcardsapi.com/api/deck/${ deckId }/draw/?count=2`);
     const response = await data.json();
     if (pot === 4) {
-        computerAction = "Check";
+        computerAction = ACTIONS.Check;
     } else if (shouldComputerCall(response.cards)){
-        computerAction = "Call";
+        computerAction = ACTIONS.Call;
     } else {
-        computerAction = "Fold";
+        computerAction = ACTIONS.Fold;
     }
 
-    if(computerAction === "Call") {
+    if(computerAction === ACTIONS.Call) {
         // játékos: Bet (vaktétek és játékos licit)
         // számítógép: 2
         // kassza: pot
@@ -255,7 +255,7 @@ async function computerMoveAfterBet() {
         pot += difference;
     }
 
-    if (computerAction === 'Check' || computerAction === 'Call') {
+    if (computerAction === ACTIONS.Check || computerAction === ACTIONS.Call) {
         computerCards = response.cards;
         render();
         const winner = await showdown();

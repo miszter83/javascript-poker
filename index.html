@@ -1,51 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Poker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
     <header class="main-area-container header-container">
-        <h1>Poker</h1>
-        <button class="btn btn-primary js-new-game-button">Új Játék</button>
+      <h1>Poker</h1>
+      <button class="btn btn-primary js-new-game-button">Új Játék</button>
     </header>
     <div class="players-container main-area-container">
-        <div class="player-container container">
-            <section class="js-player-chip-container"></section>
-            <section class="js-player-cards-container"></section>
-            <section class="js-bet-area invisible">
-                <label for="bet-amount">Bet</label>
-                <input  
-                type="range"
-                class="bet-slider"
-                name="bet-amount" 
-                id="bet-amount"
-                min="1"
-                max="1">
-                <label for="bet-amount" class="js-slider-value" ></label>
-                <button class="btn btn-warning js-bet-button">Bet</button>
-                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                    <button type="button" class="btn btn-danger js-betpot">Pot</button>
-                    <button type="button" class="btn btn-warning js-bet25">25%</button>
-                    <button type="button" class="btn btn-success js-bet50">50%</button>
-                  </div>
-            </section> 
-        </div>
-       <div class="player-container container">
-            <section class="js-computer-chip-container"></section>
-            <section class="js-computer-cards-container"></section>
-            <section class="js-computer-action"></section>
-       </div>
+      <div class="player-container container">
+        <section class="js-player-chip-container"></section>
+        <section class="js-player-cards-container"></section>
+        <section class="js-bet-area invisible">
+          <label for="bet-amount">Bet</label>
+          <input
+            type="range"
+            class="bet-slider"
+            name="bet-amount"
+            id="bet-amount"
+            min="1"
+            max="1"
+          />
+          <label for="bet-amount" class="js-slider-value"></label>
+          <button class="btn btn-warning js-bet-button">Bet</button>
+          <div
+            class="btn-group"
+            role="group"
+            aria-label="Basic mixed styles example"
+          >
+            <button type="button" class="btn btn-danger js-betpot">Pot</button>
+            <button type="button" class="btn btn-warning js-bet25">25%</button>
+            <button type="button" class="btn btn-success js-bet50">50%</button>
+          </div>
+        </section>
+      </div>
+      <div class="player-container container">
+        <section class="js-computer-chip-container"></section>
+        <section class="js-computer-cards-container"></section>
+        <section class="js-computer-action"></section>
+      </div>
     </div>
-     
+
     <section class="js-pot-container container pot-container"></section>
 
     <section class="js-community-cards container cc-container"></section>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./constans.js"></script>
     <script src="./poker.js"></script>
-</body>
+  </body>
 </html>

@@ -33,7 +33,8 @@ let {
     computerBets,    // számítógép licitje ebben a licitkörben
     computerStatus,   // számítógép státuszinformációja (győzőtt, veszetett, döntetlen, bedobta)   
     playerBetPlaced, // játékos már licitált
-    pot              // kassza
+    pot,              // kassza
+    timeoutIds,      // setTimeout ID lista
 } = getInitialState();
 
 function getInitialState() {
@@ -50,7 +51,8 @@ function getInitialState() {
         computerBets: 0,
         computerStatus: "",
         playerBetPlaced: false,
-        pot: 0
+        pot: 0,
+        timeoutIds: [],
     };
 }
 // Állapotmenedzsment TODO: új leosztás indításánál ezeket az értékeket érdemes frissíteni.
@@ -68,6 +70,9 @@ function getInitialState() {
 
 
 function initialize() {
+    for (let id of timeoutIds) {
+        clearTimeout(id);
+    }    
     ({ deckId, 
        playerCards, 
        computerCards, 
@@ -80,7 +85,8 @@ function initialize() {
        computerBets,
        computerStatus, 
        playerBetPlaced, 
-       pot
+       pot,
+       timeoutIds,
      } = getInitialState());
      
      // A bet slider állapota csak a DOM-ban van rögzítve. Hozzuk alapértelmezésbe.
@@ -187,7 +193,7 @@ function startGame() {
 }
 
 function endHand(winner = null) {
-    setTimeout(() => {
+    const id = setTimeout(() => {
         if (computerAction === ACTIONS.Fold) {
             playerChips += pot;
             pot = 0;
@@ -204,6 +210,7 @@ function endHand(winner = null) {
         }        
         render();    
     }, 2000);
+    timeoutIds.push(id);
 }
 
 function shouldComputerCall(computerCards) {

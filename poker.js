@@ -51,7 +51,7 @@ function getInitialState() {
         playerChips: 100,
         playerBets: 0,
         playerStatus: "",
-        computerChips: 50,
+        computerChips: 100,
         computerBets: 0,
         computerStatus: "",
         playerBetPlaced: false,
@@ -71,15 +71,13 @@ function getInitialState() {
 // computerAction = "";
 // Gyakorlatilag mindent resetelünk, kivéve a zsetonállást.
 
-
 function initializeGame() {
     ({ 
        playerChips, 
        computerChips, 
     } = getInitialState());
     initializeHand();
-}     
-     
+}         
 
 function initializeHand() {
     for (let id of timeoutIds) {
@@ -102,7 +100,6 @@ function initializeHand() {
         playerBetPlaced, 
         timeoutIds,
       } = getInitialState());
-
 }
 
 function canBet() {
@@ -165,7 +162,6 @@ function render() {
     renderSlider();
     renderActions();
     renderStatusInfo();
-
 }
 
 async function drawPlayerCards() {
@@ -176,10 +172,15 @@ async function drawPlayerCards() {
 }
 
 function postBlinds() {
+    if(computerChips === 1) {
+        computerChips = 0;
+        computerBets = 1;   
+    } else {
+        computerChips -= 2;
+        computerBets += 2;
+    }
     playerChips -= 1;
     playerBets += 1;
-    computerChips -= 2;
-    computerBets += 2;
     render();
 }
 
@@ -228,6 +229,8 @@ function endHand(winner = null) {
 
 function shouldComputerCall(computerCards) {
     if (computerCards.length !== 2) return false; //extra védelem
+    if (computerChips === 0) return true; // számítógép all in van
+
     const card1Code = computerCards[0].code;    //pl. AC, 4H, 9D, 0H (10: 0)
     const card2Code = computerCards[1].code;
     const card1Value = card1Code[0];
@@ -247,8 +250,8 @@ function shouldComputerCall(computerCards) {
 const SHOWDOWN_API_PREFIX = "https://api.pokerapi.dev/v1/winner/texas_holdem";
 function cardsToString(cards) {
    return cards.map(x => x.code[0] === '0' ? '1' + x.code : x.code).toString();
-
 }
+
 async function getWinner() {
     // https://api.pokerapi.dev/v1/winner/texas_holdem?cc=AC,KD,QH,JS,7C&pc[]=10S,8C&pc[]=3S,2C&pc[]=QS,JH
     const cc = cardsToString(communityCards);
@@ -276,10 +279,20 @@ async function showdown() {
     return winner;
 }
 
+function returnExtraBetsFromPot() {
+    if (playerBets > computerChips + computerBets) {
+        let chipsToReturnToPlayer = playerBets - computerChips - computerBets;
+        playerBets -= chipsToReturnToPlayer;
+        playerChips += chipsToReturnToPlayer;
+    }
+}
+
 async function computerMoveAfterBet() {
     const data = await fetch(`https://www.deckofcardsapi.com/api/deck/${ deckId }/draw/?count=2`);
     const response = await data.json();
-    if (getPot() === 4) {
+    
+    // A játékos csakl egészített VAGY a számítógépnek nincs licitálásra váró zsetonja
+    if (playerBets === 2 || computerChips === 0) {
         computerAction = ACTIONS.Check;
     } else if (shouldComputerCall(response.cards)){
         computerAction = ACTIONS.Call;
@@ -287,6 +300,9 @@ async function computerMoveAfterBet() {
         computerAction = ACTIONS.Fold;
     }
 
+    if (computerAction === ACTIONS.Check || computerAction === ACTIONS.Call) {
+        returnExtraBetsFromPot();
+    }
     if(computerAction === ACTIONS.Call) {
         // játékos: Bet (vaktétek és játékos licit)
         // számítógép: 2
@@ -295,11 +311,7 @@ async function computerMoveAfterBet() {
         // 2 zsetont már betett a számítógép vaktétként, így Bet - 2-t
         // kell megadnia. 
         // Bet - 2 =  Pot - 4
-        if (playerBets > computerChips + computerBets) {
-            let chipsToReturnToPlayer = playerBets - computerChips - computerBets;
-            playerBets -= chipsToReturnToPlayer;
-            playerChips += chipsToReturnToPlayer;
-        }
+        returnExtraBetsFromPot();
         const difference = playerBets - computerBets;
         computerChips -= difference;
         computerBets += difference;

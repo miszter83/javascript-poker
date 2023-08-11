@@ -171,16 +171,24 @@ async function drawPlayerCards() {
     playerCards = response.cards;
 }
 
+function forcedShowDown() {
+    // játék állapota: játékos megtette a tétjét (nem tud több tétet tenni)
+    playerBetPlaced = true;
+    
+    computerMoveAfterBet();
+}
+
 function postBlinds() {
-    if(computerChips === 1) {
-        computerChips = 0;
+    playerChips -= 1;
+    playerBets += 1;
+    if (computerChips === 1 || playerChips === 0) {
+        computerChips -= 1;
         computerBets = 1;   
+        
     } else {
         computerChips -= 2;
         computerBets += 2;
     }
-    playerChips -= 1;
-    playerBets += 1;
     render();
 }
 
@@ -194,6 +202,9 @@ async function startHand() {
     deckId = response.deck_id;
     await drawPlayerCards();
     render();
+    if (computerChips === 0 || playerChips === 0 && playerBets === computerBets) {
+        forcedShowDown();
+    }
 }    
 
 // EGy játék egy vagy több leosztásból áll.
@@ -292,7 +303,7 @@ async function computerMoveAfterBet() {
     const response = await data.json();
     
     // A játékos csakl egészített VAGY a számítógépnek nincs licitálásra váró zsetonja
-    if (playerBets === 2 || computerChips === 0) {
+    if (playerBets <= 2 || computerChips === 0) {
         computerAction = ACTIONS.Check;
     } else if (shouldComputerCall(response.cards)){
         computerAction = ACTIONS.Call;

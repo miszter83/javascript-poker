@@ -12,6 +12,7 @@ const betButton = document.querySelector('.js-bet-button');
 const betPotButton = document.querySelector('.js-betpot');
 const bet25Button = document.querySelector('.js-bet25');
 const bet50Button = document.querySelector('.js-bet50');
+const foldButton = document.querySelector('.js-fold-button');
 
 const computerCardsContainer = document.querySelector('.js-computer-cards-container');
 const computerChipContainer = document.querySelector('.js-computer-chip-container');
@@ -183,8 +184,7 @@ function postBlinds() {
     playerBets += 1;
     if (computerChips === 1 || playerChips === 0) {
         computerChips -= 1;
-        computerBets = 1;   
-        
+        computerBets = 1;     
     } else {
         computerChips -= 2;
         computerBets += 2;
@@ -202,12 +202,12 @@ async function startHand() {
     deckId = response.deck_id;
     await drawPlayerCards();
     render();
-    if (computerChips === 0 || playerChips === 0 && playerBets === computerBets) {
+    if (playerChips === 0 || computerChips === 0 && playerBets === computerBets) {
         forcedShowDown();
     }
 }    
 
-// EGy játék egy vagy több leosztásból áll.
+// Egy játék egy vagy több leosztásból áll.
 function startGame() {
     initializeGame();
     startHand();
@@ -218,7 +218,7 @@ function newHand () {
     startHand()
 }
 
-function endHand(winner = null) {
+function endHand(winner = null, delay = 2000) {
     const id = setTimeout(() => {
         if (computerAction === ACTIONS.Fold || winner === STATUS.Player) {
             playerChips += getPot();
@@ -234,7 +234,7 @@ function endHand(winner = null) {
         if(computerChips > 0 && playerChips > 0){
             document.querySelector(".js-new-hand-button").removeAttribute("disabled");    
         }
-    }, 2000);
+    }, delay);
     timeoutIds.push(id);
 }
 
@@ -322,7 +322,6 @@ async function computerMoveAfterBet() {
         // 2 zsetont már betett a számítógép vaktétként, így Bet - 2-t
         // kell megadnia. 
         // Bet - 2 =  Pot - 4
-        returnExtraBetsFromPot();
         const difference = playerBets - computerBets;
         computerChips -= difference;
         computerBets += difference;
@@ -359,7 +358,13 @@ function bet() {
     render();
     // ellenfél reakciója
     computerMoveAfterBet();
+}
 
+function fold() {
+    playerStatus,    // játékos státuszinformációja (győzőtt, veszetett, döntetlen, bedobta)
+    computerStatus = STATUS.Computer;   // számítógép státuszinformációja
+    playerCards = [];  
+    endHand(STATUS.Computer, 0); // számítógépnek adjuk a kasszát
 }
 
 function getPlayerPotBet() {
@@ -389,5 +394,6 @@ bet25Button.addEventListener('click', ()=> setSliderValue(25));
 bet50Button.addEventListener('click', ()=> setSliderValue(50));
 
 betButton.addEventListener('click', bet);
+foldButton.addEventListener('click', fold);
 initializeGame();
 render();
